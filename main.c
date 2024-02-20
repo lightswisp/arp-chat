@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <pcap.h>
 #include <pthread.h>
-
+#include <unistd.h>
 
 #define PCAP_FAILURE - 1
 #define DATAGRAM_SIZE 42
