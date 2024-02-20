@@ -13,8 +13,13 @@
 #define PCAP_PKT_CNT_LIMIT 0
 #define PCAP_TIMEOUT_LIMIT 1
 
+void show_usage();
+void close_all();
 void set_arp_spa_tpa(unsigned char * text, unsigned char * data);
 void generate_empty_arp_frame(unsigned char * dst, unsigned char * src, unsigned char * data);
+void generate_arp(pcap_t * pcap_handle, char * text, int size, unsigned char * data);
+void* input_thread(void * peer);
+void* arp_listen_and_decode(void * peer);
 
 const unsigned short arp_datagram = 0x0608;
 const unsigned short arp_htype = 0x0100;
