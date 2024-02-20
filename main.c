@@ -91,7 +91,6 @@ void generate_arp(pcap_t* pcap_handle, char* text, int size, unsigned char* data
 				exit(1);
 			}
 			free(spa_tpa);
-			sleep(0.5);
 		}
 	}
 
@@ -130,7 +129,7 @@ void* input_thread(void* peer){
 void* arp_listen_and_decode(void* peer){
 	unsigned char* name = (unsigned char*)peer;
 	struct pcap_pkthdr packet_header;
-	printf("listening for second (%02x) peer...", *name);
+	printf("listening for second (%02x) peer...\n\n", *name);
 	const unsigned char* packet;
 	for(;;){
 		if(!device && !pcap_handle)
@@ -139,19 +138,21 @@ void* arp_listen_and_decode(void* peer){
 		if (NULL == packet)
 			continue;
 		if(memcmp(packet+6, name, MAC_SIZE) == 0){
-		
-			unsigned char* text = malloc(MSG_MAX_SIZE);
-			memset(text, 0, MSG_MAX_SIZE);
-			memcpy(text, packet+28, 4);
-			memcpy(text+4, packet+34, 4);
 
-			printf("\n%s", text);
+			// yes, this is ugly. But who cares :)
+			for(int i = 0; i<MSG_MAX_SIZE/2; i++){
+				printf("%c", (char)packet[28+i]);
+			}
+
+			for(int j = MSG_MAX_SIZE/2; j < MSG_MAX_SIZE; j++){
+				printf("%c", (char)packet[34+j]);
+			}
+
 		}
 
 		//printf("packet total length %d\n", packet_header.len);
 		
 	}
-	//sleep(1);
 }
 
 int main(int argc, char* argv[]){
@@ -216,9 +217,9 @@ int main(int argc, char* argv[]){
 			close_all();
 			return 1;
 		}
-
-		pthread_create(&th1, NULL, input_thread, src);
 		pthread_create(&th2, NULL, arp_listen_and_decode, peer);
+		sleep(1);
+		pthread_create(&th1, NULL, input_thread, src);
 		for(;;){sleep(1);};
 
 		close_all();
